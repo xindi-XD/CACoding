@@ -2,11 +2,11 @@ package app;
 
 import data_access.FileUserDataAccessObject;
 import entity.CommonUserFactory;
-import interface_adapter.login.LoginViewModel;
-import interface_adapter.logged_in.LoggedInViewModel;
-import interface_adapter.signup.SignupViewModel;
 import interface_adapter.ViewManagerModel;
-import use_case.login.LoginUserDataAccessInterface;
+import interface_adapter.clear_users.ClearViewModel;
+import interface_adapter.logged_in.LoggedInViewModel;
+import interface_adapter.login.LoginViewModel;
+import interface_adapter.signup.SignupViewModel;
 import view.LoggedInView;
 import view.LoginView;
 import view.SignupView;
@@ -17,6 +17,7 @@ import java.awt.*;
 import java.io.IOException;
 
 public class Main {
+
     public static void main(String[] args) {
         // Build the main program window, the main panel containing the
         // various cards, and the layout, and stitch them together.
@@ -43,15 +44,22 @@ public class Main {
         LoggedInViewModel loggedInViewModel = new LoggedInViewModel();
         SignupViewModel signupViewModel = new SignupViewModel();
 
+        ClearViewModel clearViewModel = new ClearViewModel();
+        // I added one line above.
+
         FileUserDataAccessObject userDataAccessObject;
+        FileUserDataAccessObject clearDataAccessObject; // I added it.
         try {
             userDataAccessObject = new FileUserDataAccessObject("./users.csv", new CommonUserFactory());
+            clearDataAccessObject = userDataAccessObject;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
-        SignupView signupView = SignupUseCaseFactory.create(viewManagerModel, loginViewModel, signupViewModel, userDataAccessObject);
+
+        SignupView signupView = SignupUseCaseFactory.create(viewManagerModel, loginViewModel, signupViewModel, userDataAccessObject, clearViewModel, clearDataAccessObject);
         views.add(signupView, signupView.viewName);
+        // I added two parameters.
 
         LoginView loginView = LoginUseCaseFactory.create(viewManagerModel, loginViewModel, loggedInViewModel, userDataAccessObject);
         views.add(loginView, loginView.viewName);

@@ -16,6 +16,8 @@ public class LoginInteractor implements LoginInputBoundary {
     public void execute(LoginInputData loginInputData) {
         String username = loginInputData.getUsername();
         String password = loginInputData.getPassword();
+        // Maybe it's because there are two getUsername methods called. One for loginInputData, and the
+        // other one for user. Might as well not confuse the two?
         if (!userDataAccessObject.existsByName(username)) {
             loginPresenter.prepareFailView(username + ": Account does not exist.");
         } else {
@@ -25,6 +27,7 @@ public class LoginInteractor implements LoginInputBoundary {
             } else {
 
                 User user = userDataAccessObject.get(loginInputData.getUsername());
+                // No factory is required because user exists in database.
 
                 LoginOutputData loginOutputData = new LoginOutputData(user.getName(), false);
                 loginPresenter.prepareSuccessView(loginOutputData);
