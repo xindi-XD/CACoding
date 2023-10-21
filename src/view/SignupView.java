@@ -1,5 +1,7 @@
 package view;
 
+import interface_adapter.clear_users.ClearController;
+import interface_adapter.clear_users.ClearViewModel;
 import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupState;
 import interface_adapter.signup.SignupViewModel;
@@ -15,22 +17,27 @@ import java.beans.PropertyChangeListener;
 
 public class SignupView extends JPanel implements ActionListener, PropertyChangeListener {
     public final String viewName = "sign up";
-
+    private final ClearViewModel clearViewModel;
+    private final ClearController clearController;
+    // I added the two above.
+    // TODO Not final, what does it mean?
     private final SignupViewModel signupViewModel;
     private final JTextField usernameInputField = new JTextField(15);
     private final JPasswordField passwordInputField = new JPasswordField(15);
     private final JPasswordField repeatPasswordInputField = new JPasswordField(15);
     private final SignupController signupController;
-
     private final JButton signUp;
     private final JButton cancel;
 
     // TODO Note: this is the new JButton for clearing the users file
     private final JButton clear;
 
-    public SignupView(SignupController controller, SignupViewModel signupViewModel) {
+    public SignupView(ClearViewModel clearViewModel, ClearController clearController,
+                      SignupController signupController, SignupViewModel signupViewModel) {
+        this.clearController = clearController;
+        this.clearViewModel = clearViewModel;
 
-        this.signupController = controller;
+        this.signupController = signupController;
         this.signupViewModel = signupViewModel;
         signupViewModel.addPropertyChangeListener(this);
 
@@ -54,13 +61,14 @@ public class SignupView extends JPanel implements ActionListener, PropertyChange
         //      a CLEAR_BUTTON_LABEL constant which is defined in the SignupViewModel class.
         //      You need to add this "clear" button to the "buttons" panel.
         clear = new JButton(SignupViewModel.CLEAR_BUTTON_LABEL);
+        buttons.add(clear);
 
         signUp.addActionListener(
                 // This creates an anonymous subclass of ActionListener and instantiates it.
                 new ActionListener() {
                     public void actionPerformed(ActionEvent evt) {
                         if (evt.getSource().equals(signUp)) {
-                            SignupState currentState = signupViewModel.getState();
+                            SignupState currentState = signupViewModel.getSignupState();
 
                             signupController.execute(
                                     currentState.getUsername(),
@@ -79,7 +87,11 @@ public class SignupView extends JPanel implements ActionListener, PropertyChange
                 new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-
+                        if (e.getSource().equals(clear)){
+//                            ClearState currentState = SignupView.this.clearViewModel.getState();
+                            // TODO what is the line above about?
+                            clearController.execute();
+                        }
                     }
                 }
         );
@@ -94,7 +106,7 @@ public class SignupView extends JPanel implements ActionListener, PropertyChange
                 new KeyListener() {
                     @Override
                     public void keyTyped(KeyEvent e) {
-                        SignupState currentState = signupViewModel.getState();
+                        SignupState currentState = signupViewModel.getSignupState();
                         String text = usernameInputField.getText() + e.getKeyChar();
                         currentState.setUsername(text);
                         signupViewModel.setState(currentState);
@@ -113,7 +125,7 @@ public class SignupView extends JPanel implements ActionListener, PropertyChange
                 new KeyListener() {
                     @Override
                     public void keyTyped(KeyEvent e) {
-                        SignupState currentState = signupViewModel.getState();
+                        SignupState currentState = signupViewModel.getSignupState();
                         currentState.setPassword(passwordInputField.getText() + e.getKeyChar());
                         signupViewModel.setState(currentState);
                     }
@@ -134,7 +146,7 @@ public class SignupView extends JPanel implements ActionListener, PropertyChange
                 new KeyListener() {
                     @Override
                     public void keyTyped(KeyEvent e) {
-                        SignupState currentState = signupViewModel.getState();
+                        SignupState currentState = signupViewModel.getSignupState();
                         currentState.setRepeatPassword(repeatPasswordInputField.getText() + e.getKeyChar());
                         signupViewModel.setState(currentState); // Hmm, is this necessary?
                     }
